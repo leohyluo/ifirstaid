@@ -70,7 +70,7 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 	private MainSymptomService mainSymptomService;
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
+ 
 	@Override
 	public Long saveEventAidRecord(String eventId, String serverId, List<PlanVo> planvoList, TokenVo tokenVo) {
 		EventRecordParam seatInfo = DataPool.getEntity(eventId, EventRecordParam.class);
