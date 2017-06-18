@@ -242,6 +242,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		
 		int inputKqId = Integer.parseInt(param.getKqId());
 		String inputAnswerId = param.getAnswerId();
+		String inputAnswerText = param.getCommExplain();
 		String standareKqIds = cacheKeyq.getAllKeyQIDs();
 		String[] arr = standareKqIds.split(",");
 		List<Integer> kqidList = Arrays.asList(arr).stream().map(Integer::parseInt).collect(Collectors.toList());
@@ -265,8 +266,18 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		if(CollectionUtils.isEmpty(allKeyqList)) {
 			return null;
 		}
+		
+		String processKqIds = StringUtils.isEmpty(cacheKeyq.getProcessKeyQIDs()) ? String.valueOf(inputKqId) : cacheKeyq.getProcessKeyQIDs() + "," + inputKqId;
+		String processAnswerIds = StringUtils.isEmpty(cacheKeyq.getProcessAnswerIDs()) ? String.valueOf(inputAnswerId) : cacheKeyq.getProcessAnswerIDs() + "," + inputAnswerId;
+		String processAnswerTexts = StringUtils.isEmpty(cacheKeyq.getProcessAnswerTexts()) ? String.valueOf(inputAnswerText) : cacheKeyq.getProcessAnswerTexts() + "," + inputAnswerText;
+		
 		int lastKqId = allKeyqList.stream().sorted((e1, e2)->e2.getKqID().compareTo(e1.getKqID())).map(e->e.getKqID()).findFirst().get();
+		
 		if(inputKqId == lastKqId) {
+			cacheKeyq.setProcessKeyQIDs(processKqIds);
+			cacheKeyq.setProcessAnswerIDs(processAnswerIds);
+			cacheKeyq.setProcessAnswerTexts(processAnswerTexts);
+			cacheKeyQService.save(cacheKeyq);
 			return null;
 		}
 		String forwardId = "";
@@ -287,11 +298,10 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 			Integer nextKqId = map.keySet().stream().sorted(Integer::compareTo).findFirst().get();
 			voList = allKeyqList.stream().filter(e->e.getKqID()==nextKqId).map(KeyQVo::new).collect(Collectors.toList());
 		}
-		String processKqIds = StringUtils.isEmpty(cacheKeyq.getProcessKeyQIDs()) ? String.valueOf(inputKqId) : cacheKeyq.getProcessKeyQIDs() + "," + inputKqId;
-		String processAnswerIds = StringUtils.isEmpty(cacheKeyq.getProcessAnswerIDs()) ? String.valueOf(inputAnswerId) : cacheKeyq.getProcessAnswerIDs() + "," + inputAnswerId;
 		
 		cacheKeyq.setProcessKeyQIDs(processKqIds);
 		cacheKeyq.setProcessAnswerIDs(processAnswerIds);
+		cacheKeyq.setProcessAnswerTexts(processAnswerTexts);
 		cacheKeyQService.save(cacheKeyq);
 		return voList;
 	}
@@ -348,12 +358,15 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 	private void updateCacheKeyqWhenPrev(CacheKeyQ cacheKeyq, Integer kqId) {
 		String processKqIds = cacheKeyq.getProcessKeyQIDs();
 		String processAnswerIds = cacheKeyq.getProcessAnswerIDs();
+		String processAnswerTexts = cacheKeyq.getProcessAnswerTexts();
 		
 		List<Integer> kqIdList = Arrays.asList(processKqIds.split(",")).stream().map(Integer::parseInt)
 				.filter(e->e < kqId).collect(Collectors.toList()); 
 		List<Integer> answerIdList = Arrays.asList(processAnswerIds.split(",")).stream().map(Integer::parseInt)
 				.collect(Collectors.toList());
 		answerIdList = answerIdList.subList(0, kqIdList.size());
+		List<String> answerTextList = Arrays.asList(processAnswerTexts.split(",", -1)).stream().collect(Collectors.toList());
+		answerTextList = answerTextList.subList(0, kqIdList.size());
 		
 		StringJoiner kqIdJoiner = new StringJoiner(",");
 		StringJoiner answerIdJoiner = new StringJoiner(",");
@@ -365,6 +378,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		
 		cacheKeyq.setProcessKeyQIDs(processKqIds);
 		cacheKeyq.setProcessAnswerIDs(processAnswerIds);
+		cacheKeyq.setProcessAnswerTexts(processAnswerTexts);
 		cacheKeyQService.save(cacheKeyq);
 	}
 }

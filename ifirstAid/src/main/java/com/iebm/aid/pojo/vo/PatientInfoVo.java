@@ -1,6 +1,8 @@
-package com.iebm.aid.controller.req;
+package com.iebm.aid.pojo.vo;
 
 import java.util.StringJoiner;
+
+import org.springframework.beans.BeanUtils;
 
 import com.iebm.aid.pojo.AidFiles;
 import com.iebm.aid.pojo.AidRecord;
@@ -11,15 +13,15 @@ import com.iebm.aid.utils.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel("报案基础信息")
-public class BasicInfoReq {
-	
-	@ApiModelProperty("任务id")
-	private String serverId;
+@ApiModel("记录详情-患者信息")
+public class PatientInfoVo {
 
 	//呼救主诉id
 	@ApiModelProperty("主诉id")
-	private String mainSymptomId;
+	private String mainSympId;
+	
+	//呼叫主诉
+	private String mainSymptomText;
 	
 	//是否是自己呼救
 	@ApiModelProperty("是否是自己呼救(1：自己呼救 2：熟人帮助呼救 3：陌生人帮助呼救)")
@@ -67,12 +69,24 @@ public class BasicInfoReq {
 	@ApiModelProperty("发生了什么")
 	private String whatHappen;
 
-	public String getMainSymptomId() {
-		return mainSymptomId;
+	public PatientInfoVo(EventAidRecord record) {
+		BeanUtils.copyProperties(record, this);
 	}
 
-	public void setMainSymptomId(String mainSymptomId) {
-		this.mainSymptomId = mainSymptomId;
+	public String getMainSympId() {
+		return mainSympId;
+	}
+
+	public void setMainSympId(String mainSympId) {
+		this.mainSympId = mainSympId;
+	}
+
+	public String getMainSymptomText() {
+		return mainSymptomText;
+	}
+
+	public void setMainSymptomText(String mainSymptomText) {
+		this.mainSymptomText = mainSymptomText;
 	}
 
 	public String getCallType() {
@@ -113,14 +127,6 @@ public class BasicInfoReq {
 
 	public void setHasAware(String hasAware) {
 		this.hasAware = hasAware;
-	}
-
-	public String getServerId() {
-		return serverId;
-	}
-
-	public void setServerId(String serverId) {
-		this.serverId = serverId;
 	}
 
 	public String getHasBreath() {

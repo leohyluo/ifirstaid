@@ -3,7 +3,7 @@ package com.iebm.aid.controller.req;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel("查询急救档案详情实体")
+@ApiModel("查询急救记录详情实体")
 public class SearchRecordDetailParam {
 
 	@ApiModelProperty("记录id")

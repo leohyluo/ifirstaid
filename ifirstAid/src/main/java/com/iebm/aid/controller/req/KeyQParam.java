@@ -14,6 +14,8 @@ public class KeyQParam {
 	private String kqId;
 	@ApiModelProperty("答案id")
 	private String answerId;
+	@ApiModelProperty("自填项")
+	private String commExplain;
 	@ApiModelProperty("上/下一个问题,prev/next")
 	private String type;
 	@ApiModelProperty("所有问题id集合,以逗号分隔")
@@ -70,6 +72,12 @@ public class KeyQParam {
 	}
 	public void setEventId(String eventId) {
 		this.eventId = eventId;
+	}
+	public String getCommExplain() {
+		return commExplain;
+	}
+	public void setCommExplain(String commExplain) {
+		this.commExplain = commExplain;
 	}
 	
 }

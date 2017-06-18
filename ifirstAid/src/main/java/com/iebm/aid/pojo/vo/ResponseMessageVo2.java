@@ -13,10 +13,11 @@ public class ResponseMessageVo2 {
 	private int code;
 	private QuesOrPlan data;
 	private String msg;
+	private Long recordId;
 		
-	public ResponseMessageVo2(String type, List<KeyQVo> keyqList, List<PlanVo> planList, Mpds mpds) {
+	public ResponseMessageVo2(String type, List<KeyQVo> keyqList, List<PlanVo> planList, Mpds mpds, Long recordId) {
 		this.code = ResponseStatus.SUCCESS.code();
-		this.data = new QuesOrPlan(type, keyqList, planList, mpds);
+		this.data = new QuesOrPlan(type, keyqList, planList, mpds, recordId);
 	}
 
 	public int getCode() {
@@ -42,6 +43,15 @@ public class ResponseMessageVo2 {
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
+
+	public Long getRecordId() {
+		return recordId;
+	}
+
+	public void setRecordId(Long recordId) {
+		this.recordId = recordId;
+	}
+	
 }
 
 class QuesOrPlan {
@@ -49,12 +59,14 @@ class QuesOrPlan {
 	private List<KeyQVo> keyqList;
 	private List<PlanVo> planList;
 	private Mpds mpds;
+	private Long recordId;
 	
-	public QuesOrPlan(String type, List<KeyQVo> keyqList, List<PlanVo> planList, Mpds mpds) {
+	public QuesOrPlan(String type, List<KeyQVo> keyqList, List<PlanVo> planList, Mpds mpds, Long recordId) {
 		this.type = type;
 		this.keyqList = keyqList;
 		this.planList = planList;
 		this.mpds = mpds;
+		this.recordId = recordId;
 	}
 	
 	public List<KeyQVo> getKeyqList() {
@@ -80,6 +92,14 @@ class QuesOrPlan {
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public Long getRecordId() {
+		return recordId;
+	}
+
+	public void setRecordId(Long recordId) {
+		this.recordId = recordId;
 	}
 	
 }

@@ -1,6 +1,8 @@
 package com.iebm.aid.pojo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,8 +10,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.springframework.beans.BeanUtils;
 
 import com.iebm.aid.common.BaseEntity;
+import com.iebm.aid.pojo.vo.DeltaChange;
+import com.iebm.aid.utils.CollectionUtils;
 
 @Entity
 @Table(name = "table_event_aid_record")
@@ -45,6 +52,18 @@ public class EventAidRecord extends BaseEntity {
 	
 	@Column(name = "create_time")
 	private LocalDateTime createTime;
+	
+	//已问过问题的id，用“,”分隔
+	@Column(name = "processKeyQIDs")
+	private String processKeyQIDs;
+	
+	//已问过问题的答案id，用“,”分隔
+	@Column(name = "processAnswerIDs")
+	private String processAnswerIDs;
+	
+	//自己填写的信息，用“,”分隔
+	@Column(name = "processAnswerTexts")
+	private String processAnswerTexts;
 	
 	//生成预案id集合
 	@Column(name = "plan_ids")
@@ -100,6 +119,20 @@ public class EventAidRecord extends BaseEntity {
 	//0新增 1修改
 	@Column(name = "operate_type")
 	private String operateType;
+	
+	//发生变化的数据
+	@Column(name = "delta_change")
+	private String deltaChange;
+	
+	@Transient
+	private List<DeltaChange> deltaList;
+	
+	public EventAidRecord clone(){
+		EventAidRecord newEntity = new EventAidRecord();
+		BeanUtils.copyProperties(this, newEntity);
+		newEntity.setId(null);
+		return newEntity;
+	}
 
 	public Long getId() {
 		return id;
@@ -283,6 +316,49 @@ public class EventAidRecord extends BaseEntity {
 
 	public void setOperateType(String operateType) {
 		this.operateType = operateType;
+	}
+
+	public String getProcessKeyQIDs() {
+		return processKeyQIDs;
+	}
+
+	public void setProcessKeyQIDs(String processKeyQIDs) {
+		this.processKeyQIDs = processKeyQIDs;
+	}
+
+	public String getProcessAnswerIDs() {
+		return processAnswerIDs;
+	}
+
+	public void setProcessAnswerIDs(String processAnswerIDs) {
+		this.processAnswerIDs = processAnswerIDs;
+	}
+
+	public String getProcessAnswerTexts() {
+		return processAnswerTexts;
+	}
+
+	public void setProcessAnswerTexts(String processAnswerTexts) {
+		this.processAnswerTexts = processAnswerTexts;
+	}
+
+	public List<DeltaChange> getDeltaList() {
+		if(CollectionUtils.isEmpty(deltaList)) {
+			deltaList = new ArrayList<>();
+		}
+		return deltaList;
+	}
+
+	public void setDeltaList(List<DeltaChange> deltaList) {
+		this.deltaList = deltaList;
+	}
+
+	public String getDeltaChange() {
+		return deltaChange;
+	}
+
+	public void setDeltaChange(String deltaChange) {
+		this.deltaChange = deltaChange;
 	}
 	
 	

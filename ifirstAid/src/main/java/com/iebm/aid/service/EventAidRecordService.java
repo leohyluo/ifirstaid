@@ -6,10 +6,10 @@ import org.springframework.data.domain.Page;
 
 import com.iebm.aid.common.BaseService;
 import com.iebm.aid.controller.req.EARecord4WebParam;
-import com.iebm.aid.controller.req.SearchAidFilesParam;
+import com.iebm.aid.controller.req.EditRecordParam;
 import com.iebm.aid.pojo.EventAidRecord;
-import com.iebm.aid.pojo.vo.AidRecordVo;
 import com.iebm.aid.pojo.vo.EventAidRecord4WebVo;
+import com.iebm.aid.pojo.vo.EventAidRecordDetail4WebVo;
 import com.iebm.aid.pojo.vo.PlanVo;
 import com.iebm.aid.pojo.vo.TokenVo;
 
@@ -22,18 +22,26 @@ public interface EventAidRecordService extends BaseService<EventAidRecord, Long>
 	 * @param planvoList
 	 * @param tokenVo
 	 */
-	void saveEventAidRecord(String eventId, String serverId, List<PlanVo> planvoList, TokenVo tokenVo);
+	Long saveEventAidRecord(String eventId, String serverId, List<PlanVo> planvoList, TokenVo tokenVo);
 	
 	/**
 	 * 查询急救记录详情
 	 * @param id
 	 * @return
 	 */
-	EventAidRecord getDetail(String id);
+	EventAidRecordDetail4WebVo getDetail(Long id);
 	
 	/**
 	 * 分页查询
 	 * @return
 	 */	
 	public Page<EventAidRecord4WebVo> findByPage(EARecord4WebParam param, String userId);
+	
+	/**
+	 * 修改急救记录
+	 * @param userId
+	 * @param recordId
+	 * @param param
+	 */
+	void edit(String userId, EditRecordParam param);
 }

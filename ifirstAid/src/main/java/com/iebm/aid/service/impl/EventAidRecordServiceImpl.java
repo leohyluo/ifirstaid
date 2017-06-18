@@ -35,15 +35,19 @@ import com.iebm.aid.common.GlobalConstants;
 import com.iebm.aid.common.enums.AppType;
 import com.iebm.aid.controller.req.BasicInfoReq;
 import com.iebm.aid.controller.req.EARecord4WebParam;
+import com.iebm.aid.controller.req.EditRecordParam;
 import com.iebm.aid.controller.req.third.EventRecordParam;
 import com.iebm.aid.pojo.CacheKeyQ;
 import com.iebm.aid.pojo.EventAidRecord;
 import com.iebm.aid.pojo.KeyQ;
 import com.iebm.aid.pojo.MainSymptom;
 import com.iebm.aid.pojo.vo.EventAidRecord4WebVo;
+import com.iebm.aid.pojo.vo.EventAidRecordDetail4WebVo;
 import com.iebm.aid.pojo.vo.PlanVo;
+import com.iebm.aid.pojo.vo.ProcessKeyqVo;
 import com.iebm.aid.pojo.vo.TokenVo;
 import com.iebm.aid.repository.EventAidRecordRepository;
+import com.iebm.aid.repository.PlanRepository;
 import com.iebm.aid.service.CacheKeyQService;
 import com.iebm.aid.service.EventAidRecordService;
 import com.iebm.aid.service.MainSymptomService;
@@ -59,6 +63,8 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 	@Resource
 	private EventAidRecordRepository repository;
 	@Resource
+	private PlanRepository planRepository;
+	@Resource
 	private CacheKeyQService cacheKeyQService;
 	@Resource
 	private MainSymptomService mainSymptomService;
@@ -66,12 +72,12 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public void saveEventAidRecord(String eventId, String serverId, List<PlanVo> planvoList, TokenVo tokenVo) {
+	public Long saveEventAidRecord(String eventId, String serverId, List<PlanVo> planvoList, TokenVo tokenVo) {
 		EventRecordParam seatInfo = DataPool.getEntity(eventId, EventRecordParam.class);
 		BasicInfoReq basicInfo = DataPool.getEntity(serverId, BasicInfoReq.class);
 		if(basicInfo == null) {
 			logger.warn("could not write event aid record, because require parameter missing");
-			return;
+			return null;
 		}
 		EventAidRecord record = null;
 		if(seatInfo != null) {
@@ -102,13 +108,59 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 		record.setPlanIds(joiner.toString());
 		record.setCreateTime(LocalDateTime.now());
 		record.setCreator(tokenVo.getUserId());
-		save(record);
+		record.setProcessKeyQIDs(cacheKeyq.getProcessKeyQIDs());
+		record.setProcessAnswerIDs(cacheKeyq.getProcessAnswerIDs());
+		record.setProcessAnswerTexts(cacheKeyq.getProcessAnswerTexts());
+		EventAidRecord ear = save(record);
+		return ear.getId();
 	}
 	
 	@Override
-	public EventAidRecord getDetail(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public EventAidRecordDetail4WebVo getDetail(Long id) {
+		String subSplit = ",";
+		EventAidRecord record = get(id);
+		EventAidRecordDetail4WebVo recordDetailVo = new EventAidRecordDetail4WebVo(record);
+		String planIds = record.getPlanIds();
+		if(StringUtils.isNotEmpty(planIds)) {
+			List<String> planIdList = Arrays.asList(planIds.split(","));
+			List<PlanVo> planvoList = Optional.ofNullable(planRepository.findByPlanIdIn(planIdList))
+					.orElseGet(ArrayList::new).stream().map(PlanVo::new).collect(toList());
+			recordDetailVo.setPlans(planvoList);
+		}
+		
+		//构建诊断过程
+		String mainId = record.getMainSympId();
+		String processKqIds = record.getProcessKeyQIDs();
+		String processAnswerIds = record.getProcessAnswerIDs();
+		String processAnswerTexts = record.getProcessAnswerTexts();
+		int kqIdCount = org.springframework.util.StringUtils.countOccurrencesOf(processKqIds, subSplit);
+		int answerIdCount = org.springframework.util.StringUtils.countOccurrencesOf(processAnswerIds, subSplit);
+		int answerTextCount = org.springframework.util.StringUtils.countOccurrencesOf(processAnswerTexts, subSplit);
+		
+		if(kqIdCount == answerIdCount && answerIdCount == answerTextCount) {
+			List<Integer> processKqIdList = Arrays.asList(processKqIds.split(subSplit)).stream().map(Integer::parseInt).collect(toList());
+			List<String> processAnswerIdList = Arrays.asList(processAnswerIds.split(subSplit));
+			List<String> processAnswerTextList = Arrays.asList(processAnswerTexts.split(subSplit,-1));
+			List<KeyQ> keyqList = DataPool.get(KeyQ.class).stream().filter(e->e.getMainID().equals(mainId)).collect(toList());
+			List<ProcessKeyqVo> processKeyqVoList = new ArrayList<>();
+			
+			for(int i = 0; i < processKqIdList.size(); i++) {
+				Integer itemKqId = processKqIdList.get(i);
+				String answerId = processAnswerIdList.get(i);
+				String answerText = processAnswerTextList.get(i);
+				keyqList.stream().filter(e->e.getKqID() == itemKqId).filter(e->e.getAnswerId().equals(answerId))
+					.findFirst().ifPresent(e->{
+						ProcessKeyqVo keyqvo = new ProcessKeyqVo(e);
+						keyqvo.setCommExplain(answerText);
+						processKeyqVoList.add(keyqvo);
+					});
+			}
+			recordDetailVo.setHistoryKeyq(processKeyqVoList);
+			
+		} else {
+			logger.info("could not load cure process by record id", id);
+		}
+		return recordDetailVo;
 	}
 
 	@Override
@@ -149,12 +201,6 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 				if(StringUtils.isNotEmpty(mainSymptomText)) {
 					ps.add(cb.equal(root.get("mainSymptomText"), mainSymptomText));
 				}
-				/*if(startTime != null && endTime != null) {
-					ps.add(cb.between(root.get("createTime"), startTime, endTime));
-				}
-				if(StringUtils.isNotEmpty(userId)) {
-					ps.add(cb.equal(root.get("creator"), userId));
-				}*/
 				return CollectionUtils.isEmpty(ps) ? null : cb.and(ps.toArray(new Predicate[ps.size()]));
 			}
 		};
@@ -166,6 +212,17 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 		System.out.println("list size =========="+list.size());
 		return page;
 	}
+	
+
+	@Override
+	public void edit(String userId, EditRecordParam param) {
+		Long recordId = Long.valueOf(param.getRecordId());
+		EventAidRecord record = get(recordId);
+		EventAidRecord newRecord = record.clone();
+		param.mergeCommonInfo(record.getId().toString(), newRecord);
+		save(newRecord);
+	}
+
 
 	@Override
 	protected BaseRepository<EventAidRecord, Long> getRepository() {
@@ -203,6 +260,5 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 		}
 		return sb.toString();
 	}
-
 
 }
