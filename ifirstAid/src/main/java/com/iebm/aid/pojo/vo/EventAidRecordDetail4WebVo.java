@@ -19,6 +19,9 @@ public class EventAidRecordDetail4WebVo {
 	@ApiModelProperty("预案")
 	private List<PlanVo> plans;
 	
+	@ApiModelProperty("已发送分站")
+	private String stationList;
+	
 	@ApiModelProperty("修改的内容")
 	private String deltaChange;
 	
@@ -58,4 +61,13 @@ public class EventAidRecordDetail4WebVo {
 	public void setDeltaChange(String deltaChange) {
 		this.deltaChange = deltaChange;
 	}
+
+	public String getStationList() {
+		return stationList;
+	}
+
+	public void setStationList(String stationList) {
+		this.stationList = stationList;
+	}
+	
 }

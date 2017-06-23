@@ -5,8 +5,6 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -1876,17 +1874,6 @@ public class DateUtils {
 		return dateCompare(ymdend, ymdbef, "yyyyMMdd");
 	}
 
-	public static void main(String[] args) {
-		Date date = new Date();
-		long time1=0L
-				;
-		long time2=0L;
-		
-		System.out.println(time1 = date.getTime());
-		System.out.println(time2 = DateUtils.getInternalDateByMin(date, -5).getTime());
-		System.out.println(time1 - time2);
-		System.out.println((time1 - time2) / 1000 / 60 );
-	}
 
 	/**
 	 * 得到date 日期的年和月如2005-09

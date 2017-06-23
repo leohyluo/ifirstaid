@@ -4,9 +4,12 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.iebm.aid.common.BaseEntity;
@@ -25,8 +28,8 @@ public class StationMessage extends BaseEntity {
 	@Column(name = "station_id")
 	private Long stationId;
 	
-	@Column(name = "record_id")
-	private Long recordId;
+//	@Column(name = "record_id")
+//	private Long recordId;
 	
 	@Column(name = "status")
 	private Long status;
@@ -42,7 +45,11 @@ public class StationMessage extends BaseEntity {
 	
 	@Column(name = "read_time")
 	private LocalDateTime readTime;
-
+	
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="record_id", nullable=false)
+	private EventAidRecord eventAidRecord;
+	
 	public Long getId() {
 		return id;
 	}
@@ -59,13 +66,13 @@ public class StationMessage extends BaseEntity {
 		this.stationId = stationId;
 	}
 
-	public Long getRecordId() {
-		return recordId;
-	}
-
-	public void setRecordId(Long recordId) {
-		this.recordId = recordId;
-	}
+//	public Long getRecordId() {
+//		return recordId;
+//	}
+//
+//	public void setRecordId(Long recordId) {
+//		this.recordId = recordId;
+//	}
 
 	public Long getStatus() {
 		return status;
@@ -105,6 +112,14 @@ public class StationMessage extends BaseEntity {
 
 	public void setCreator(String creator) {
 		this.creator = creator;
+	}
+
+	public EventAidRecord getEventAidRecord() {
+		return eventAidRecord;
+	}
+
+	public void setEventAidRecord(EventAidRecord eventAidRecord) {
+		this.eventAidRecord = eventAidRecord;
 	}
 	
 	

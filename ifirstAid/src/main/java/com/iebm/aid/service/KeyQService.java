@@ -32,4 +32,5 @@ public interface KeyQService extends BaseService<KeyQ, Long> {
 	List<KeyQ> findByMainSymptomId(String mainSymptomId);
 	
 	List<KeyQVo> searchKeyQ(KeyQParam param);
+	
 }

@@ -2,7 +2,9 @@ package com.iebm.aid.service.impl;
 
 import static java.util.stream.Collectors.toList;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -142,8 +144,10 @@ public class AidRecordServiceImpl extends AbstractService<AidRecord, Long> imple
 		} else if ("3".equals(type)) {
 			startTime = LocalDateTime.now().plusMonths(-1).withHour(0).withMinute(0).withSecond(0);
 		} else if ("4".equals(type)) {
-			startTime = LocalDateTime.parse(param.getStartTime());
-			endTime = LocalDateTime.parse(param.getEndTime());
+			LocalDate startDate = LocalDate.parse(param.getStartTime());
+			LocalDate endDate = LocalDate.parse(param.getEndTime());
+			startTime = LocalDateTime.of(startDate, LocalTime.of(0, 0, 0));
+			endTime = LocalDateTime.of(endDate, LocalTime.of(23, 59, 59));
 		} 
 		List<AidRecord> recordList = repository.findByCreateTimeBetween(startTime, endTime);
 		return recordList.stream().map(AidRecordVo::new).collect(toList());

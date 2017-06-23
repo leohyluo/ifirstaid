@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import com.iebm.aid.common.BaseEntity;
 import com.iebm.aid.pojo.vo.DeltaChange;
 import com.iebm.aid.utils.CollectionUtils;
+import com.iebm.aid.utils.StringUtils;
 
 @Entity
 @Table(name = "table_event_aid_record")
@@ -124,12 +125,24 @@ public class EventAidRecord extends BaseEntity {
 	@Column(name = "delta_change")
 	private String deltaChange;
 	
+	//危急分级
+	@Column(name = "mpds_title")
+	private String mpdsTitle;
+	
+	@Column(name = "root_id")
+	private String rootId;
+	
 	@Transient
 	private List<DeltaChange> deltaList;
 	
 	public EventAidRecord clone(){
 		EventAidRecord newEntity = new EventAidRecord();
 		BeanUtils.copyProperties(this, newEntity);
+		if(StringUtils.isEmpty(rootId)) {
+			newEntity.setRootId(String.valueOf(id));
+		} else {
+			newEntity.setRootId(rootId);
+		}
 		newEntity.setId(null);
 		return newEntity;
 	}
@@ -359,6 +372,22 @@ public class EventAidRecord extends BaseEntity {
 
 	public void setDeltaChange(String deltaChange) {
 		this.deltaChange = deltaChange;
+	}
+
+	public String getMpdsTitle() {
+		return mpdsTitle;
+	}
+
+	public void setMpdsTitle(String mpdsTitle) {
+		this.mpdsTitle = mpdsTitle;
+	}
+
+	public String getRootId() {
+		return rootId;
+	}
+
+	public void setRootId(String rootId) {
+		this.rootId = rootId;
 	}
 	
 	

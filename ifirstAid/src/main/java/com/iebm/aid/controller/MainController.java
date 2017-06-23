@@ -28,6 +28,7 @@ import com.iebm.aid.pojo.vo.MainSymptomVo;
 import com.iebm.aid.pojo.vo.PlanVo;
 import com.iebm.aid.pojo.vo.ResponseMessageVo;
 import com.iebm.aid.pojo.vo.ResponseMessageVo2;
+import com.iebm.aid.pojo.vo.StationVo;
 import com.iebm.aid.pojo.vo.TokenVo;
 import com.iebm.aid.service.AidRecordService;
 import com.iebm.aid.service.CacheKeyQService;
@@ -38,6 +39,7 @@ import com.iebm.aid.service.MainSymptomService;
 import com.iebm.aid.service.MpdsService;
 import com.iebm.aid.service.PlanService;
 import com.iebm.aid.service.StationMessageService;
+import com.iebm.aid.service.StationService;
 import com.iebm.aid.service.UserService;
 import com.iebm.aid.utils.CollectionUtils;
 import com.iebm.aid.utils.JsonUtils;
@@ -79,6 +81,8 @@ public class MainController {
 	private EventAidRecordService eventAidRecordService;
 	@Resource
 	private StationMessageService stationMessageService;
+	@Resource
+	private StationService stationService;
 	
 	@ApiOperation("120急救中心初始化接口")
 	@ApiImplicitParams({
@@ -163,6 +167,16 @@ public class MainController {
 		}
 		
 		return new ResponseMessageVo2(type, keyqList, planList, mpds, recordId);
+	}
+	
+	@ApiOperation(value = "获取急救分站列表", notes = "获取急救分站列表", produces = "application/json")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="token", value="客户端token", required = true, dataType="String", paramType="header")
+	})
+	@PostMapping("/findStations")
+	public ResponseMessage findStations() {
+		List<StationVo> voList = stationService.findAllStation();
+		return WebUtils.buildSuccessResponseMessage(voList);
 	}
 	
 	@ApiOperation(value = "发送预案", notes = "发送预案", produces = "application/json")

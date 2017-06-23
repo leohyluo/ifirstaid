@@ -1,5 +1,7 @@
 package com.iebm.aid.service.impl;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,8 +51,9 @@ import com.iebm.aid.utils.StringUtils;
 @Service
 public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQService{
 	
-	private static final String NEXT = "next";
 	private static final String PREV = "prev";
+	private static final String NEXT = "next";
+	private static final String SKIP = "skip";
 	
 	@Resource
 	private KeyQRepository repository;
@@ -80,7 +83,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		List<KeyQVo> list = new ArrayList<>();
  		if(StringUtils.isEmpty(answerId)) { 			
 			list = Optional.ofNullable(repository.findByMainIDAndKqIDOrderByAnswerId(mainId, curQuesNo)).orElseGet(ArrayList::new)
-					.stream().map(KeyQVo::new).collect(Collectors.toList()); 
+					.stream().map(KeyQVo::new).collect(toList()); 
 		} else {
 			Optional<KeyQ> optionalVal = Optional.ofNullable(repository.findByMainIDAndKqIDAndAnswerIdOrderByAnswerId(mainId, curQuesNo, answerId)).orElseGet(ArrayList::new)
 				.stream().filter(e->!StringUtils.isEmpty(e.getForwardId())).findFirst();
@@ -128,7 +131,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 			optionalKeyq.ifPresent(consumer);
 			//获取每个答案对应的处置预案id,并将其存放至map中
 			List<KqplanLink> itemKqplanLit = Optional.of(kqplanList).orElseGet(ArrayList::new).stream().filter(e->e.getKqId().equals(questionNo))
-				.filter(e->e.getAnswerId().equals(answerId)).collect(Collectors.toList());
+				.filter(e->e.getAnswerId().equals(answerId)).collect(toList());
 			for(KqplanLink item : itemKqplanLit) {
 				if(planMap.containsKey(item.getPlanId())) {
 					int count = planMap.get(item.getPlanId());
@@ -153,7 +156,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		Map<String, Integer> sortMap = new LinkedHashMap<>();
 		planMap.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
 			.forEachOrdered(e->sortMap.put(e.getKey(), e.getValue()));
-		List<String> planIdList = sortMap.keySet().stream().collect(Collectors.toList());
+		List<String> planIdList = sortMap.keySet().stream().collect(toList());
 		String planIds = "";
 		for(String str : planIdList) {
 			planIds += str + ",";
@@ -165,7 +168,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		}
 		
 		List<PlanVo> planvoList = Optional.of(planList).orElseGet(ArrayList::new)
-				.stream().map(PlanVo::new).collect(Collectors.toList());
+				.stream().map(PlanVo::new).collect(toList());
 		return new PlanResultVo(explain, planvoList);
 	}
 	
@@ -231,7 +234,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		}
 		return null;
 	}
-		
+			
 	@Override
 	protected BaseRepository<KeyQ, Long> getRepository() {
 		return repository;
@@ -381,4 +384,5 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		cacheKeyq.setProcessAnswerTexts(processAnswerTexts);
 		cacheKeyQService.save(cacheKeyq);
 	}
+
 }

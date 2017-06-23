@@ -292,61 +292,70 @@ public class BasicInfoReq {
 		e.setAidAddress(StringUtils.string(this.getAidAddress()));
 		e.setAidMobile(StringUtils.string(this.getAidMobile()));
 		e.setWhatHappen(StringUtils.string(this.getWhatHappen()));
-		if(StringUtils.isNotEmpty(this.getStayWithPatient())) {
-			String withPatientStr = "";
-			if("1".equals(this.getStayWithPatient())) {
-				withPatientStr = "是";
-			} else if ("2".equals(this.getStayWithPatient())) {
-				withPatientStr = "否";
-			}
-			e.setWithPatient(withPatientStr);
-		}
-		if(StringUtils.isNotEmpty(this.getCallType())) {
-			String callTypeStr = "";
-			if("1".equals(this.getCallType())) {
-				callTypeStr = "自己呼救";
-			} else if ("2".equals(this.getCallType())) {
-				callTypeStr = "熟人帮助呼救";
-			} else if ("3".equals(this.getCallType())) {
-				callTypeStr = "陌生人帮助呼救";
-			}
-			e.setCallType(callTypeStr);
-		}
+//		if(StringUtils.isNotEmpty(this.getStayWithPatient())) {
+//			String withPatientStr = "";
+//			if("1".equals(this.getStayWithPatient())) {
+//				withPatientStr = "是";
+//			} else if ("2".equals(this.getStayWithPatient())) {
+//				withPatientStr = "否";
+//			}
+//			e.setWithPatient(withPatientStr);
+//		}
+		e.setWithPatient(this.getStayWithPatient());
+		
+//		if(StringUtils.isNotEmpty(this.getCallType())) {
+//			String callTypeStr = "";
+//			if("1".equals(this.getCallType())) {
+//				callTypeStr = "自己呼救";
+//			} else if ("2".equals(this.getCallType())) {
+//				callTypeStr = "熟人帮助呼救";
+//			} else if ("3".equals(this.getCallType())) {
+//				callTypeStr = "陌生人帮助呼救";
+//			}
+//			e.setCallType(callTypeStr);
+//		}
+		e.setCallType(this.getCallType());
+		
 		e.setName(this.getName());
 		e.setAge(this.getAge());
-		if(StringUtils.isNotEmpty(this.getHasAware())) {
-			String awareStr = "";
-			if("1".equals(this.getHasAware())) {
-				awareStr = "有意识";
-			} else if ("2".equals(this.getHasAware())) {
-				awareStr = "无意识";
-			} else if ("3".equals(this.getHasAware())) {
-				awareStr = "不详";
-			}
-			e.setHasAware(awareStr);
-		}
-		if(StringUtils.isNotEmpty(this.getGender())) {
-			String genderStr = "";
-			if("1".equals(this.getGender())) {
-				genderStr = "男";
-			} else if ("2".equals(this.getGender())) {
-				genderStr = "女";
-			} else if ("3".equals(this.getGender())) {
-				genderStr = "不详";
-			}
-			e.setGender(genderStr);
-		}
-		if(StringUtils.isNotEmpty(this.getHasBreath())) {
-			String breathStr = "";
-			if("1".equals(this.getHasBreath())) {
-				breathStr = "有呼吸";
-			} else if ("2".equals(this.getHasBreath())) {
-				breathStr = "无呼吸";
-			} else if ("3".equals(this.getHasBreath())) {
-				breathStr = "不详";
-			}
-			e.setHasBreath(breathStr);
-		}
+//		if(StringUtils.isNotEmpty(this.getHasAware())) {
+//			String awareStr = "";
+//			if("1".equals(this.getHasAware())) {
+//				awareStr = "有意识";
+//			} else if ("2".equals(this.getHasAware())) {
+//				awareStr = "无意识";
+//			} else if ("3".equals(this.getHasAware())) {
+//				awareStr = "不详";
+//			}
+//			e.setHasAware(awareStr);
+//		}
+		e.setHasAware(this.getHasAware());
+		
+//		if(StringUtils.isNotEmpty(this.getGender())) {
+//			String genderStr = "";
+//			if("1".equals(this.getGender())) {
+//				genderStr = "男";
+//			} else if ("2".equals(this.getGender())) {
+//				genderStr = "女";
+//			} else if ("3".equals(this.getGender())) {
+//				genderStr = "不详";
+//			}
+//			e.setGender(genderStr);
+//		}
+		e.setGender(this.getGender());
+		
+//		if(StringUtils.isNotEmpty(this.getHasBreath())) {
+//			String breathStr = "";
+//			if("1".equals(this.getHasBreath())) {
+//				breathStr = "有呼吸";
+//			} else if ("2".equals(this.getHasBreath())) {
+//				breathStr = "无呼吸";
+//			} else if ("3".equals(this.getHasBreath())) {
+//				breathStr = "不详";
+//			}
+//			e.setHasBreath(breathStr);
+//		}
+		e.setHasBreath(this.getHasBreath());
 	}
 	
 	public AidFiles parseToAidFiles() {

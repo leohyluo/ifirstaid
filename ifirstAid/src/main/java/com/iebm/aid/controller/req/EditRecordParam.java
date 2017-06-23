@@ -186,16 +186,17 @@ public class EditRecordParam {
 
 	public void mergeCommonInfo(String originalId, EventAidRecord record) {
 		List<DeltaChange> deltaList = CollectionUtils.isEmpty(record.getDeltaList()) ? new ArrayList<>() : record.getDeltaList();
-		if(StringUtils.isNotEmpty(name)) {
+		if(StringUtils.isNotEmpty(name)&&!name.equals(record.getName())) {
 			DeltaChange delta = new DeltaChange("name", record.getName(), this.name);
 			deltaList.add(delta);
+			record.setName(name);
 		}
-		if(StringUtils.isNotEmpty(aidAddress)) {
+		if(StringUtils.isNotEmpty(aidAddress)&&!aidAddress.equals(record.getAidAddress())) {
 			DeltaChange delta = new DeltaChange("aidAddress", record.getAidAddress(), this.aidAddress);
 			deltaList.add(delta);
 			record.setAidAddress(aidAddress);
 		}
-		if(StringUtils.isNotEmpty(whatHappen)) {
+		if(StringUtils.isNotEmpty(whatHappen)&&!whatHappen.equals(record.getWhatHappen())) {
 			DeltaChange delta = new DeltaChange("whatHappen", record.getWhatHappen(), this.whatHappen);
 			deltaList.add(delta);
 			record.setWhatHappen(whatHappen);

@@ -37,6 +37,9 @@ public class EventAidRecord4WebVo {
 	@ApiModelProperty("呼叫主诉")
 	private String mainSymptomText;
 	
+	@ApiModelProperty("指派急救单位(单位1(已读))")
+	private String stationList;
+	
 	@ApiModelProperty("任务状态")
 	private String status;
 	
@@ -117,6 +120,14 @@ public class EventAidRecord4WebVo {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getStationList() {
+		return stationList;
+	}
+
+	public void setStationList(String stationList) {
+		this.stationList = stationList;
 	}
 	
 	
