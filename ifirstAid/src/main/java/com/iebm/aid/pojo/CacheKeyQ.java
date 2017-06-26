@@ -1,5 +1,12 @@
 package com.iebm.aid.pojo;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +15,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.iebm.aid.common.BaseEntity;
+import com.iebm.aid.pojo.vo.KeyqDelta;
+import com.iebm.aid.utils.CollectionUtils;
+import com.iebm.aid.utils.JsonUtils;
 
 @Entity
 @Table(name = "table_cachekeyq")
@@ -159,6 +169,50 @@ public class CacheKeyQ extends BaseEntity {
 
 	public void setProcessAnswerTexts(String processAnswerTexts) {
 		this.processAnswerTexts = processAnswerTexts;
+	}
+	
+	public void merge(EventAidRecord record) {
+		String oldKqIds = record.getProcessKeyQIDs();
+		String oldAnswerIds = record.getProcessAnswerIDs();
+		String oldInputTexts = record.getProcessAnswerTexts();
+		
+		List<KeyqDelta> keyqDeltaList = new ArrayList<>(); 
+		Map<Integer, KeyqDelta> oldProcessMap = toMap(oldKqIds, oldAnswerIds, oldInputTexts);
+		Map<Integer, KeyqDelta> newProcessMap = toMap(processKeyQIDs, processAnswerIDs, processAnswerTexts);
+		for(Integer kqId : newProcessMap.keySet()) {
+			KeyqDelta newKeyq = newProcessMap.get(kqId);
+			if(oldProcessMap.containsKey(kqId)) {
+				KeyqDelta oldKeyq = oldProcessMap.get(kqId);
+				if(newKeyq.equals(oldKeyq) == false) {
+					keyqDeltaList.add(newKeyq);
+				}
+			}
+		}
+		String keyqDelta = "";
+		if(CollectionUtils.isNotEmpty(keyqDeltaList)) {
+			keyqDelta = JsonUtils.toJsonString(keyqDeltaList);
+		}
+		record.setKeyqDelta(keyqDelta);
+	}
+	
+	private Map<Integer, KeyqDelta> toMap(String kqIds, String answerIds, String inputTexts) {
+		List<Integer> kqIdList = Stream.of(kqIds.split(",")).map(Integer::parseInt).collect(Collectors.toList());
+		List<String> answerIdList = Stream.of(answerIds.split(",")).collect(Collectors.toList());
+		List<String> inputTextList = Stream.of(inputTexts.split(",", -1)).collect(Collectors.toList());
+		if(kqIdList.size() != answerIdList.size() || kqIdList.size() != inputTextList.size()) {
+			System.out.println("kqIds,answerIds,inputTexts 参数个数不一致");
+			return null;
+		}
+		List<KeyqDelta> deltaList = new ArrayList<>();
+		for(int i = 0; i < kqIdList.size(); i++) {
+			Integer KqId = kqIdList.get(i);
+			String answerId = answerIdList.get(i);
+			String inputText = inputTextList.get(i);
+			KeyqDelta delta = new KeyqDelta(KqId, answerId, inputText);
+			deltaList.add(delta);
+		}
+		Map<Integer, KeyqDelta> map = deltaList.stream().collect(Collectors.toMap(KeyqDelta::getKqID, Function.identity()));
+		return map;
 	}
 	
 }

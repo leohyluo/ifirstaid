@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.iebm.aid.controller.req.EventParam;
 import com.iebm.aid.controller.req.PatientParam;
 import com.iebm.aid.pojo.EventAidRecord;
+import com.iebm.aid.utils.JsonUtils;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,5 +49,10 @@ public class EventRecordParam {
 			logger.error("error on parseToEventAidRecord", e);
 			return null;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return JsonUtils.toJsonString(this);
 	}
 }

@@ -28,6 +28,7 @@ import com.iebm.aid.common.BaseRepository;
 import com.iebm.aid.common.DataPool;
 import com.iebm.aid.controller.req.KeyQParam;
 import com.iebm.aid.pojo.CacheKeyQ;
+import com.iebm.aid.pojo.EventAidRecord;
 import com.iebm.aid.pojo.KeyQ;
 import com.iebm.aid.pojo.KeyQUse;
 import com.iebm.aid.pojo.KqplanLink;
@@ -44,6 +45,7 @@ import com.iebm.aid.repository.KqplanLinkRepository;
 import com.iebm.aid.repository.MpdsRepository;
 import com.iebm.aid.repository.PlanRepository;
 import com.iebm.aid.service.CacheKeyQService;
+import com.iebm.aid.service.EventAidRecordService;
 import com.iebm.aid.service.KeyQService;
 import com.iebm.aid.utils.StringUtils;
 
@@ -67,7 +69,9 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 	private KeyQUseRepository keyQUseRepository;
 	@Resource
 	private CacheKeyQService cacheKeyQService;
-
+	@Resource
+	private EventAidRecordService eventAidRecordService;
+	
 	@Override
 	public void decryptAll() {
 		/*this.findAll().stream().peek(e->{
@@ -270,9 +274,13 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 			return null;
 		}
 		
-		String processKqIds = StringUtils.isEmpty(cacheKeyq.getProcessKeyQIDs()) ? String.valueOf(inputKqId) : cacheKeyq.getProcessKeyQIDs() + "," + inputKqId;
+		/*String processKqIds = StringUtils.isEmpty(cacheKeyq.getProcessKeyQIDs()) ? String.valueOf(inputKqId) : cacheKeyq.getProcessKeyQIDs() + "," + inputKqId;
 		String processAnswerIds = StringUtils.isEmpty(cacheKeyq.getProcessAnswerIDs()) ? String.valueOf(inputAnswerId) : cacheKeyq.getProcessAnswerIDs() + "," + inputAnswerId;
-		String processAnswerTexts = StringUtils.isEmpty(cacheKeyq.getProcessAnswerTexts()) ? String.valueOf(inputAnswerText) : cacheKeyq.getProcessAnswerTexts() + "," + inputAnswerText;
+		String processAnswerTexts = StringUtils.isEmpty(cacheKeyq.getProcessAnswerTexts()) ? String.valueOf(inputAnswerText) : cacheKeyq.getProcessAnswerTexts() + "," + inputAnswerText;*/
+		
+		String processKqIds = param.getAllKqIds();
+		String processAnswerIds = param.getAllAnswerIds();
+		String processAnswerTexts = param.getAllTexts();
 		
 		int lastKqId = allKeyqList.stream().sorted((e1, e2)->e2.getKqID().compareTo(e1.getKqID())).map(e->e.getKqID()).findFirst().get();
 		
@@ -309,6 +317,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		return voList;
 	}
 	
+	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	private List<KeyQVo> prevKeyQ(String mainId, KeyQParam param, CacheKeyQ cacheKeyq) {
 		String inputKqId = param.getKqId();
@@ -319,7 +328,7 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 				.filter(e->e.getKqID() == prevKqId).collect(Collectors.toList());
 		List<KeyQVo> voList = list.stream().map(KeyQVo::new).collect(Collectors.toList());
 		//更新已回答的问题序号
-		updateCacheKeyqWhenPrev(cacheKeyq, prevKqId);
+		updateCacheKeyqWhenPrev(cacheKeyq, param);
 		return voList;
 	}
 	
@@ -358,8 +367,8 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-	private void updateCacheKeyqWhenPrev(CacheKeyQ cacheKeyq, Integer kqId) {
-		String processKqIds = cacheKeyq.getProcessKeyQIDs();
+	private void updateCacheKeyqWhenPrev(CacheKeyQ cacheKeyq, KeyQParam param) {
+		/*String processKqIds = cacheKeyq.getProcessKeyQIDs();
 		String processAnswerIds = cacheKeyq.getProcessAnswerIDs();
 		String processAnswerTexts = cacheKeyq.getProcessAnswerTexts();
 		
@@ -377,7 +386,11 @@ public class KeyQServiceImpl extends AbstractService<KeyQ, Long> implements KeyQ
 		answerIdList.forEach(e->answerIdJoiner.add(String.valueOf(e)));
 		
 		processKqIds = kqIdJoiner.toString();
-		processAnswerIds = answerIdJoiner.toString();
+		processAnswerIds = answerIdJoiner.toString();*/
+		
+		String processKqIds = param.getAllKqIds();
+		String processAnswerIds = param.getAllAnswerIds();
+		String processAnswerTexts = param.getAllTexts();
 		
 		cacheKeyq.setProcessKeyQIDs(processKqIds);
 		cacheKeyq.setProcessAnswerIDs(processAnswerIds);

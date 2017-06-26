@@ -9,6 +9,12 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel("急救记录详细")
 public class EventAidRecordDetail4WebVo {
+	
+	@ApiModelProperty("serverId")
+	private String serverId;
+	
+	@ApiModelProperty("记录id")
+	private String recordId;
 
 	@ApiModelProperty("患者信息")
 	private PatientInfoVo patientInfo;
@@ -22,12 +28,18 @@ public class EventAidRecordDetail4WebVo {
 	@ApiModelProperty("已发送分站")
 	private String stationList;
 	
+	@ApiModelProperty("修改过的问题与答案")
+	private String keyqDelta;
+	
 	@ApiModelProperty("修改的内容")
 	private String deltaChange;
 	
 	public EventAidRecordDetail4WebVo(EventAidRecord record) {
+		this.recordId = String.valueOf(record.getId());
+		this.serverId = record.getServerId();
 		this.patientInfo = new PatientInfoVo(record);
 		this.deltaChange = record.getDeltaChange();
+		this.keyqDelta = record.getKeyqDelta();
 	}
 
 	public PatientInfoVo getPatientInfo() {
@@ -69,5 +81,28 @@ public class EventAidRecordDetail4WebVo {
 	public void setStationList(String stationList) {
 		this.stationList = stationList;
 	}
-	
+
+	public String getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
+	}
+
+	public String getKeyqDelta() {
+		return keyqDelta;
+	}
+
+	public void setKeyqDelta(String keyqDelta) {
+		this.keyqDelta = keyqDelta;
+	}
+
+	public String getRecordId() {
+		return recordId;
+	}
+
+	public void setRecordId(String recordId) {
+		this.recordId = recordId;
+	}
 }

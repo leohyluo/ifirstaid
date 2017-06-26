@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iebm.aid.common.DataPool;
+import com.iebm.aid.common.enums.AppType;
 import com.iebm.aid.controller.req.BasicInfoReq;
 import com.iebm.aid.controller.req.EventParam;
 import com.iebm.aid.controller.req.KeyQParam;
@@ -90,6 +91,7 @@ public class MainController {
 	})
 	@PostMapping("/initial")
 	public ResponseMessage initial(@RequestBody EventRecordParam param, HttpServletRequest request) {
+		logger.info("initial params is {}", param);
 		EventParam eventParam = param.getEventInfo();
 		String eventNo = eventParam.getEventNo();
 		String seatNo = eventParam.getSeatNo();
@@ -129,6 +131,7 @@ public class MainController {
 	@PostMapping(value = "/getFirstQues")
 	public ResponseMessageVo getFirstQues(@RequestBody BasicInfoReq basicInfo) {
 		String serverId = basicInfo.getServerId();
+		logger.info("getFirstQues input serverId is {}", serverId);
 		if(StringUtils.isNotEmpty(serverId)) {
 			DataPool.put(serverId, basicInfo);
 		} else {
@@ -163,7 +166,14 @@ public class MainController {
 			mpds = mpdsService.findMpdsGrade(cacheKeyq);
 			//保存诊断记录
 			TokenVo tokenVo = (TokenVo) request.getAttribute("tokenVo");
-			recordId = eventAidRecordService.saveEventAidRecord(eventId, serverId, planList, tokenVo);
+			AppType appType = AppType.findByType(Long.valueOf(param.getAppType()));
+
+			String inputRecordId = param.getRecordId();
+			if(StringUtils.isNotEmpty(inputRecordId)) {
+				recordId = eventAidRecordService.updateEventAidRecord(serverId, planList, tokenVo, inputRecordId, appType);
+			} else if(appType == AppType.WEB) {
+				recordId = eventAidRecordService.saveEventAidRecord(eventId, serverId, planList, tokenVo);
+			}
 		}
 		
 		return new ResponseMessageVo2(type, keyqList, planList, mpds, recordId);

@@ -104,8 +104,8 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
  
 	@Override
 	public Long saveEventAidRecord(String eventId, String serverId, List<PlanVo> planvoList, TokenVo tokenVo) {
-		EventRecordParam seatInfo = DataPool.getEntity(eventId, EventRecordParam.class);
-		BasicInfoReq basicInfo = DataPool.getEntity(serverId, BasicInfoReq.class);
+		EventRecordParam seatInfo = DataPool.take(eventId, EventRecordParam.class);
+		BasicInfoReq basicInfo = DataPool.take(serverId, BasicInfoReq.class);
 		if(basicInfo == null) {
 			logger.warn("could not write event aid record, because require parameter missing");
 			return null;
@@ -139,10 +139,55 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 		record.setPlanIds(joiner.toString());
 		record.setCreateTime(LocalDateTime.now());
 		record.setCreator(tokenVo.getUserId());
+		record.setServerId(cacheKeyq.getServerId());
+		record.setAllKeyQIDs(cacheKeyq.getAllKeyQIDs());
 		record.setProcessKeyQIDs(cacheKeyq.getProcessKeyQIDs());
 		record.setProcessAnswerIDs(cacheKeyq.getProcessAnswerIDs());
 		record.setProcessAnswerTexts(cacheKeyq.getProcessAnswerTexts());
 		EventAidRecord ear = save(record);
+		return ear.getId();
+	}
+	
+	@Override
+	public Long updateEventAidRecord(String serverId, List<PlanVo> planvoList, TokenVo tokenVo,
+			String recordId, AppType appType) {
+		
+		EventAidRecord currentRecord = get(Long.valueOf(recordId));
+		EventAidRecord newRecord = currentRecord.clone();		
+		
+		BasicInfoReq basicInfo = DataPool.getEntity(serverId, BasicInfoReq.class);
+		//当从急救主页面开始修改
+		if(basicInfo != null) {
+			basicInfo.merge(newRecord);
+		}
+		
+		newRecord.setAppType(String.valueOf(appType.getType()));
+		//basicInfo.fillEventAidRecord(record);
+		
+		CacheKeyQ cacheKeyq = cacheKeyQService.findByServerId(serverId);
+		cacheKeyq.merge(newRecord);
+		
+		MainSymptom mainSymptom = mainSymptomService.findByMainId(cacheKeyq.getSympID());
+		StringJoiner joiner = new StringJoiner(",");
+		if(CollectionUtils.isNotEmpty(planvoList)) {
+			planvoList.stream().map(PlanVo::getPlanId).collect(toList()).stream().forEach(e->joiner.add(e));
+		}
+		String mainSymptomText = mainSymptom.getTitle();
+		mainSymptomText = EBMEnDecrypt.decrypt(mainSymptomText, GlobalConstants.DECRYPT_CHARSET);
+		
+		String cureProcess = parseToProcessText(cacheKeyq.getSympID(), cacheKeyq.getProcessKeyQIDs(),
+				cacheKeyq.getProcessAnswerIDs(), cacheKeyq.getProcessAnswerTexts());
+		
+		newRecord.setMainSympId(mainSymptom.getMainId());
+		newRecord.setMainSymptomText(mainSymptomText);
+		newRecord.setCureProcess(cureProcess);
+		newRecord.setPlanIds(joiner.toString());
+		newRecord.setCreateTime(LocalDateTime.now());
+		newRecord.setCreator(tokenVo.getUserId());
+		newRecord.setProcessKeyQIDs(cacheKeyq.getProcessKeyQIDs());
+		newRecord.setProcessAnswerIDs(cacheKeyq.getProcessAnswerIDs());
+		newRecord.setProcessAnswerTexts(cacheKeyq.getProcessAnswerTexts());
+		EventAidRecord ear = save(newRecord);
 		return ear.getId();
 	}
 	
@@ -410,8 +455,10 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 		
 		List<HistoryKeyQVo> resultList = new ArrayList<>();
 		EventAidRecord record = get(Long.valueOf(recordId));
+		
 		String processKqIds = record.getProcessKeyQIDs();
 		if(StringUtils.isNotEmpty(processKqIds)) {
+			
 			String mainId = record.getMainSympId();
 			String processAnswerIds = record.getProcessAnswerIDs();
 			String processAnswerTexts = record.getProcessAnswerTexts();
@@ -449,7 +496,11 @@ public class EventAidRecordServiceImpl extends AbstractService<EventAidRecord, L
 					item.setKqTitle(EBMEnDecrypt.decrypt(kqTitle, GlobalConstants.DECRYPT_CHARSET));
 				}
 				item.setAnswerList(v);
-				item.setOriginAnswerId(answerIdMap.get(k));
+				String answerId = answerIdMap.get(k);
+				v.stream().filter(e->e.getAnswerId().equals(answerId)).findFirst().ifPresent(e->{
+					item.setOriginAnswerText(e.getAnswer());
+				});
+				item.setOriginAnswerId(answerId);
 				item.setOriginInput(answerInputTextMap.get(k));
 				resultList.add(item);
 			});

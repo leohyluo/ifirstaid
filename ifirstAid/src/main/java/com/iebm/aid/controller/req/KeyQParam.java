@@ -6,6 +6,10 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("查询问题实体")
 public class KeyQParam {
 
+	@ApiModelProperty("客户端类型 0:pad,1:web")
+	private String appType;
+	@ApiModelProperty("急救记录id")
+	private String recordId;
 	@ApiModelProperty("记录编号")
 	private String eventId;
 	@ApiModelProperty("任务id")
@@ -78,6 +82,18 @@ public class KeyQParam {
 	}
 	public void setCommExplain(String commExplain) {
 		this.commExplain = commExplain;
+	}
+	public String getRecordId() {
+		return recordId;
+	}
+	public void setRecordId(String recordId) {
+		this.recordId = recordId;
+	}
+	public String getAppType() {
+		return appType;
+	}
+	public void setAppType(String appType) {
+		this.appType = appType;
 	}
 	
 }

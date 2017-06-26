@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.iebm.aid.common.BaseService;
+import com.iebm.aid.common.enums.AppType;
 import com.iebm.aid.controller.req.EARecord4WebParam;
 import com.iebm.aid.controller.req.EditRecordParam;
 import com.iebm.aid.controller.req.HistoryRecordParam;
@@ -26,6 +27,15 @@ public interface EventAidRecordService extends BaseService<EventAidRecord, Long>
 	 * @param tokenVo
 	 */
 	Long saveEventAidRecord(String eventId, String serverId, List<PlanVo> planvoList, TokenVo tokenVo);
+	
+	/**
+	 * 更新急救记录
+	 * @param eventId
+	 * @param serverId
+	 * @param planvoList
+	 * @param tokenVo
+	 */
+	Long updateEventAidRecord(String serverId, List<PlanVo> planvoList, TokenVo tokenVo, String recordId, AppType appType);
 	
 	/**
 	 * 查询急救记录详情

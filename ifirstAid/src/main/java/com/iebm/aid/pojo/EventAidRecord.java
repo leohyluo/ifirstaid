@@ -54,6 +54,13 @@ public class EventAidRecord extends BaseEntity {
 	@Column(name = "create_time")
 	private LocalDateTime createTime;
 	
+	//CacheKeyq对象serverId字段
+	@Column(name = "server_id")
+	private String serverId;
+	
+	@Column(name = "allKeyQIDs")
+	private String allKeyQIDs;
+	
 	//已问过问题的id，用“,”分隔
 	@Column(name = "processKeyQIDs")
 	private String processKeyQIDs;
@@ -121,6 +128,10 @@ public class EventAidRecord extends BaseEntity {
 	@Column(name = "operate_type")
 	private String operateType;
 	
+	//发生改变的问题或答案
+	@Column(name = "keyq_delta")
+	private String keyqDelta;
+	
 	//发生变化的数据
 	@Column(name = "delta_change")
 	private String deltaChange;
@@ -143,7 +154,10 @@ public class EventAidRecord extends BaseEntity {
 		} else {
 			newEntity.setRootId(rootId);
 		}
+		newEntity.setOriginalId(String.valueOf(id));
 		newEntity.setId(null);
+		newEntity.setDeltaChange(null);
+		newEntity.setKeyqDelta(null);
 		return newEntity;
 	}
 
@@ -388,6 +402,30 @@ public class EventAidRecord extends BaseEntity {
 
 	public void setRootId(String rootId) {
 		this.rootId = rootId;
+	}
+
+	public String getAllKeyQIDs() {
+		return allKeyQIDs;
+	}
+
+	public void setAllKeyQIDs(String allKeyQIDs) {
+		this.allKeyQIDs = allKeyQIDs;
+	}
+
+	public String getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
+	}
+
+	public String getKeyqDelta() {
+		return keyqDelta;
+	}
+
+	public void setKeyqDelta(String keyqDelta) {
+		this.keyqDelta = keyqDelta;
 	}
 	
 	

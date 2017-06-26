@@ -1,10 +1,15 @@
 package com.iebm.aid.controller.req;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
 
+import com.iebm.aid.common.enums.OperationType;
 import com.iebm.aid.pojo.AidFiles;
 import com.iebm.aid.pojo.AidRecord;
 import com.iebm.aid.pojo.EventAidRecord;
+import com.iebm.aid.pojo.vo.DeltaChange;
+import com.iebm.aid.utils.CollectionUtils;
 import com.iebm.aid.utils.JsonUtils;
 import com.iebm.aid.utils.StringUtils;
 
@@ -363,6 +368,71 @@ public class BasicInfoReq {
 		aidFiles.setUserName(this.getName());
 		aidFiles.setGender(this.getGender());
 		return aidFiles;
+	}
+	
+	public void merge(EventAidRecord record) {
+		List<DeltaChange> deltaList = CollectionUtils.isEmpty(record.getDeltaList()) ? new ArrayList<>() : record.getDeltaList();
+		if(StringUtils.isNotEmpty(mainSymptomId) && !mainSymptomId.equals(record.getMainSympId())) {
+			DeltaChange delta = new DeltaChange("mainSympId", record.getMainSympId(), mainSymptomId);
+			deltaList.add(delta);
+			record.setMainSympId(mainSymptomId);
+		}
+		if(StringUtils.isNotEmpty(callType) && !callType.equals(record.getCallType())) {
+			DeltaChange delta = new DeltaChange("callType", record.getCallType(), callType);
+			deltaList.add(delta);
+			record.setCallType(callType);
+		}
+		if(StringUtils.isNotEmpty(stayWithPatient) && !stayWithPatient.equals(record.getWithPatient())) {
+			DeltaChange delta = new DeltaChange("withPatient", record.getWithPatient(), stayWithPatient);
+			deltaList.add(delta);
+			record.setWithPatient(stayWithPatient);
+		}
+		if(StringUtils.isNotEmpty(name) && !name.equals(record.getName())) {
+			DeltaChange delta = new DeltaChange("name", record.getName(), name);
+			deltaList.add(delta);
+			record.setName(name);
+		}
+		if(StringUtils.isNotEmpty(age) && !age.equals(record.getAge())) {
+			DeltaChange delta = new DeltaChange("age", record.getAge(), age);
+			deltaList.add(delta);
+			record.setAge(age);
+		}
+		if(StringUtils.isNotEmpty(gender) && !gender.equals(record.getGender())) {
+			DeltaChange delta = new DeltaChange("gender", record.getGender(), gender);
+			deltaList.add(delta);
+			record.setGender(gender);
+		}
+		if(StringUtils.isNotEmpty(hasAware) && !hasAware.equals(record.getHasAware())) {
+			DeltaChange delta = new DeltaChange("hasAware", record.getHasAware(), hasAware);
+			deltaList.add(delta);
+			record.setHasAware(hasAware);
+		}
+		if(StringUtils.isNotEmpty(hasBreath) && !hasBreath.equals(record.getHasBreath())) {
+			DeltaChange delta = new DeltaChange("hasBreath", record.getHasBreath(), hasBreath);
+			deltaList.add(delta);
+			record.setHasBreath(hasBreath);
+		}
+		if(StringUtils.isNotEmpty(aidAddress) && !aidAddress.equals(record.getAidAddress())) {
+			DeltaChange delta = new DeltaChange("aidAddress", record.getAidAddress(), aidAddress);
+			deltaList.add(delta);
+			record.setAidAddress(aidAddress);
+		}
+		if(StringUtils.isNotEmpty(aidMobile) && !aidMobile.equals(record.getAidMobile())) {
+			DeltaChange delta = new DeltaChange("aidMobile", record.getAidMobile(), aidMobile);
+			deltaList.add(delta);
+			record.setAidMobile(aidMobile);
+		}
+		if(StringUtils.isNotEmpty(whatHappen) && !whatHappen.equals(record.getWhatHappen())) {
+			DeltaChange delta = new DeltaChange("whatHappen", record.getWhatHappen(), whatHappen);
+			deltaList.add(delta);
+			record.setWhatHappen(whatHappen);
+		}
+		if(CollectionUtils.isNotEmpty(deltaList)) {
+			record.setOperateType(OperationType.UPDATE.getType());
+			record.getDeltaList().addAll(deltaList);
+			String deltaChangeStr = JsonUtils.toJsonString(deltaList);
+			record.setDeltaChange(deltaChangeStr);
+		}
 	}
 	
 	private int getAge(String input) {

@@ -1,6 +1,8 @@
 package com.iebm.aid.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -101,8 +103,10 @@ public class StationMessageServiceImpl extends AbstractService<StationMessage, L
 				} else if ("3".equals(type)) {
 					startTime = LocalDateTime.now().plusMonths(-1).withHour(0).withMinute(0).withSecond(0);
 				} else if ("4".equals(type)) {
-					startTime = LocalDateTime.parse(param.getStartTime());
-					endTime = LocalDateTime.parse(param.getEndTime());
+					LocalDate startdate = LocalDate.parse(param.getStartTime());
+					startTime = LocalDateTime.of(startdate, LocalTime.of(0, 0, 0));
+					LocalDate endtdate =LocalDate.parse(param.getEndTime());
+					endTime =  LocalDateTime.of(endtdate, LocalTime.of(23,59, 59));
 				}
 				if(startTime != null && endTime != null) {
 					ps.add(cb.between(root.get("createTime"), startTime, endTime));
